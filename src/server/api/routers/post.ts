@@ -6,6 +6,8 @@ import {
     publicProcedure,
 } from "~/server/api/trpc";
 import {posts} from "~/server/db/schema";
+import {rateLimiter} from "~/server/api/root";
+import {TRPCError} from "@trpc/server";
 
 export const postRouter = createTRPCRouter({
     hello: publicProcedure
@@ -19,6 +21,11 @@ export const postRouter = createTRPCRouter({
     create: protectedProcedure
         .input(z.object({name: z.string().min(1)}))
         .mutation(async ({ctx, input}) => {
+            const {success} = await rateLimiter.limit(ctx.session.user.id);
+            if (!success) {
+                throw new TRPCError({code: "TOO_MANY_REQUESTS"});
+            }
+            
             // simulate a slow db call
             await new Promise((resolve) => setTimeout(resolve, 1000));
 
