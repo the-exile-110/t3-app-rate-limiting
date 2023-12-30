@@ -6,19 +6,8 @@ import {
     publicProcedure,
 } from "~/server/api/trpc";
 import {posts} from "~/server/db/schema";
-import {rateLimiter} from "~/server/api/root";
-import {TRPCError} from "@trpc/server";
 
 export const postRouter = createTRPCRouter({
-    rateLimit: protectedProcedure
-        .query(async ({ctx}) => {
-            const {success} = await rateLimiter.limit(ctx.session.user.id);
-            if (!success) {
-                throw new TRPCError({code: "TOO_MANY_REQUESTS"});
-            }
-            return "success";
-        }),
-
     hello: publicProcedure
         .input(z.object({text: z.string()}))
         .query(({input}) => {

@@ -1,4 +1,5 @@
 import {postRouter} from "~/server/api/routers/post";
+import {rateLimitRouter} from "~/server/api/routers/rate-limit";
 import {createTRPCRouter} from "~/server/api/trpc";
 import {Ratelimit} from "@upstash/ratelimit";
 import {Redis} from "@upstash/redis";
@@ -10,6 +11,7 @@ import {Redis} from "@upstash/redis";
  */
 export const appRouter = createTRPCRouter({
     post: postRouter,
+    rate: rateLimitRouter,
 });
 
 export const rateLimiter = new Ratelimit({
